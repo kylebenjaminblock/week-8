@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.33.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.33.1/mapbox-gl.css' rel='stylesheet' />
+    <script src="js/jquery-2.2.0.js"></script>
+    <script src="js/underscore.js"></script>
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+
+<div id='map'></div>
+<script>
+
+/// Set up satellite map ///
+mapboxgl.accessToken = 'pk.eyJ1Ijoia3libG9jayIsImEiOiJjajBibnF0N3YwMnkxMzNvM2s3aXdoYmwzIn0.FGZGEZRdRCv9MwwDeJ8xjA';
+var map = new mapboxgl.Map({
+    container: 'map',
+    zoom: 13,
+    center: [39.962879, -75.142558],
+    style: 'mapbox://styles/mapbox/satellite-v9',
+    hash: false
+});
+
+/// Call and parse data ///
+var dataset = "https://gist.githubusercontent.com/kylebenjaminblock/e1a3a57312624e6a76dd13c69c8a37d5/raw/4c29fa3772e22a9522d4f0173ccb6a548dc4b03e/map.geojson";
+var featureGroup;
+var parsedData;
+
+$.ajax(dataset).done(function(dataset) {
+  parsedData=JSON.parse(dataset);
+  allData();
+});
+
+/// Add all data map as layer ///
+var allData = function(){
+  var a = L.geoJson(parsedData, {
+    filter: dataToShow,
+    style: myStyle,
+    pointToLayer: function(feature, latlng) {
+      return L.circleMarker(latlng, myStyle);
+    }
+  })
+  featureGroup = a.addTo(map);
+};
+
+ /// Add geocoder option to map
+map.addControl(new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken
+}));
+
+</script>
+
+</body>
+</html>
